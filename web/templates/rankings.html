@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Rankings — WTT Ranking Engine{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Published Rankings</h1>
+  <form method="get" class="row-fields">
+    <div>
+      <label for="category">Category</label>
+      <select id="category" name="category" onchange="this.form.submit()">
+        <option value="SEN" {{ 'selected' if category=='SEN' }}>Senior</option>
+        <option value="YOU" {{ 'selected' if category=='YOU' }}>Youth</option>
+      </select>
+    </div>
+    <div>
+      <label for="ranking_category">Ranking category</label>
+      <select id="ranking_category" name="ranking_category" onchange="this.form.submit()">
+        {% for rc in ['MS','WS','MD','WD','XD','MDI','WDI','XDI'] %}
+        <option value="{{ rc }}" {{ 'selected' if ranking_category==rc }}>{{ rc }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  {% if not results %}
+  <p class="muted">No published ranking yet for this category — run a calculation first.</p>
+  {% else %}
+  <table>
+    <tr><th>Pos</th><th>Player</th><th>Country</th><th>Points</th><th>Age-cat pos</th><th>Period</th><th>Run</th></tr>
+    {% for r in results %}
+    <tr>
+      <td>{{ r.ranking_pos }}</td>
+      <td>{{ r.player_name }}</td>
+      <td>{{ r.country_code or '—' }}</td>
+      <td>{{ r.ranking_points }}</td>
+      <td>{{ r.ranking_pos_age_category or '—' }}</td>
+      <td>{{ r.ranking_year }}-{{ '%02d'|format(r.ranking_month) }} wk{{ r.ranking_week }}</td>
+      <td><a href="{{ url_for('run_detail', run_id=r.ranking_run_id) }}">#{{ r.ranking_run_id }}</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+</div>
+{% endblock %}

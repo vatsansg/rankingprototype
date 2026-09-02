@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Import Results — WTT Ranking Engine{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Import Results</h1>
+  {% if message %}
+  <div class="success">{{ message }}</div>
+  {% endif %}
+  {% if imported %}
+  <p><a class="btn" href="{{ url_for('modify_list') }}">Manual Modifications →</a>
+     <span class="muted">Review and correct results before starting a calculation (optional).</span></p>
+  {% endif %}
+  <p class="muted">Choose a sample result file to import into <code>new_events_results</code>.
+  These are synthetic, structurally-faithful fixtures (see <code>sample_data/README.md</code>) —
+  not real player data.</p>
+  <form method="post">
+    <label for="fixture">Result file</label>
+    <select id="fixture" name="fixture">
+      {% for f in fixtures %}
+      <option value="{{ f }}">{{ f }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Import</button>
+  </form>
+</div>
+{% endblock %}

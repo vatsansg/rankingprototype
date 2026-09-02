@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Manual Modifications — WTT Ranking Engine{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Manual Modifications</h1>
+  <p class="muted">Correct an imported result's round/result position before starting a
+    calculation. Every change is recorded below with who changed it and when.</p>
+
+  <form method="get" class="row-fields">
+    <div>
+      <label for="category_code">Category</label>
+      <select id="category_code" name="category_code">
+        <option value="" {{ 'selected' if not category_code }}>All</option>
+        <option value="SEN" {{ 'selected' if category_code=='SEN' }}>Senior</option>
+        <option value="YOU" {{ 'selected' if category_code=='YOU' }}>Youth</option>
+      </select>
+    </div>
+    <div>
+      <label for="player_name">Player name contains</label>
+      <input type="text" id="player_name" name="player_name" value="{{ player_name }}" placeholder="e.g. Player 3">
+    </div>
+    <div>
+      <label for="country_code">Country contains</label>
+      <input type="text" id="country_code" name="country_code" value="{{ country_code }}" placeholder="e.g. CHN">
+    </div>
+    <div style="align-self:flex-end">
+      <button type="submit">Search</button>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Imported results ({{ results|length }})</h2>
+  {% if not results %}
+  <p class="muted">No imported results match this search — import a result file first, or widen your filters.</p>
+  {% else %}
+  <table>
+    <tr><th>Player</th><th>Country</th><th>Event</th><th>Category</th><th>Ranking Cat.</th>
+        <th>Result Position</th><th>Points</th><th>ZPP</th><th></th></tr>
+    {% for r in results %}
+    <tr>
+      <td>{{ r.player_name }}</td>
+      <td>{{ r.country_code or '—' }}</td>
+      <td>{{ r.event_name }}</td>
+      <td>{{ r.category_code }}</td>
+      <td>{{ r.ranking_category_code }}</td>
+      <td><strong>{{ r.result_position }}</strong></td>
+      <td>{{ r.ranking_points }}</td>
+      <td>{{ 'yes' if r.zero_point_penalty else '' }}</td>
+      <td><a class="btn secondary" href="{{ url_for('modify_edit', new_event_result_id=r.new_event_result_id) }}">Edit</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2>Recent modifications</h2>
+  {% if not recent_log %}
+  <p class="muted">No manual modifications logged yet.</p>
+  {% else %}
+  <table>
+    <tr><th>Player</th><th>Event</th><th>Old → New Position</th><th>Old → New Points</th><th>By</th><th>When</th></tr>
+    {% for l in recent_log %}
+    <tr>
+      <td>{{ l.player_name }}</td>
+      <td>{{ l.event_name }}</td>
+      <td>{{ l.old_result_position }} → <strong>{{ l.new_result_position }}</strong></td>
+      <td>{{ l.old_ranking_points }} → <strong>{{ l.new_ranking_points }}</strong></td>
+      <td>{{ l.modified_by }}</td>
+      <td>{{ l.modified_at }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+</div>
+{% endblock %}

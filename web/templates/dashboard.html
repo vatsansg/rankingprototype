@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — WTT Ranking Engine{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Ranking Runs</h1>
+  {% if not runs %}
+    <p class="muted">No runs yet. <a href="{{ url_for('import_results') }}">Import some results</a> and
+    <a href="{{ url_for('start_calculation') }}">start a calculation</a>.</p>
+  {% else %}
+  <table>
+    <tr>
+      <th>Run</th><th>Category</th><th>Period</th><th>Trigger</th><th>Status</th>
+      <th>Steps</th><th>Duration</th><th>Triggered by</th><th></th>
+    </tr>
+    {% for r in runs %}
+    <tr>
+      <td>#{{ r.ranking_run_id }}</td>
+      <td>{{ r.category_code }}</td>
+      <td>{{ r.ranking_year }}-{{ '%02d'|format(r.ranking_month) }} wk{{ r.ranking_week }}</td>
+      <td>{{ r.trigger_type }}{% if r.scheduled_for %} ({{ r.scheduled_for }}){% endif %}</td>
+      <td><span class="badge badge-{{ r.status }}">{{ r.status }}</span></td>
+      <td>{{ r.steps_succeeded }}/{{ r.total_steps }}{% if r.steps_failed %} ({{ r.steps_failed }} failed){% endif %}</td>
+      <td>{{ r.duration_seconds if r.duration_seconds is not none else '—' }}s</td>
+      <td>{{ r.triggered_by }}</td>
+      <td>
+        <a class="btn secondary" href="{{ url_for('run_detail', run_id=r.ranking_run_id) }}">View</a>
+        {% if r.status == 'PENDING' and r.trigger_type == 'scheduled' %}
+        <form method="post" action="{{ url_for('run_now', run_id=r.ranking_run_id) }}" style="display:inline">
+          <button type="submit">Run Now</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+</div>
+{% endblock %}

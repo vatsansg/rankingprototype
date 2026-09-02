@@ -1,0 +1,2 @@
+event_id,event_name,event_type_general_code,event_type_code,ranking_year,ranking_month,ranking_week,competitor_id,player_name,dob,gender,country_code,age_category_code,is_retired,sub_event_code,ranking_category_code,category_code,result_position,matches_played,matches_won,matches_lost,qualifier,zero_point_penalty
+83001,Bad Category Event,WCH,WCH,2026,4,15,93001,Calc Failure Player,1999-01-01,M,CHN,SEN,0,ZZ,ZZ,SEN,QF,3,2,1,0,0

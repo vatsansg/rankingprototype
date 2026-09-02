@@ -1,0 +1,7 @@
+event_id,event_name,event_type_general_code,event_type_code,ranking_year,ranking_month,ranking_week,competitor_id,player_name,dob,gender,country_code,age_category_code,is_retired,sub_event_code,ranking_category_code,category_code,result_position,matches_played,matches_won,matches_lost,qualifier,zero_point_penalty
+84001,WCDR64 Event 1,WCDR64,WCDR64,2026,2,5,94001,YOU NoDep Player 1,2009-06-01,M,CHN,U17,0,MS,MS,YOU,QF,2,1,1,0,0
+84002,WCDR64 Event 2,WCDR64,WCDR64,2026,2,5,94002,YOU NoDep Player 2,2009-06-01,M,JPN,U17,0,MS,MS,YOU,QF,2,1,1,0,0
+84003,WCDR64 Event 3,WCDR64,WCDR64,2026,2,5,94003,YOU NoDep Player 3,2009-06-01,M,GER,U17,0,MS,MS,YOU,QF,2,1,1,0,0
+84004,WCDR64 Event 4,WCDR64,WCDR64,2026,2,5,94004,YOU NoDep Player 4,2009-06-01,F,FRA,U17,0,WS,WS,YOU,QF,2,1,1,0,0
+84005,WCDR64 Event 5,WCDR64,WCDR64,2026,2,5,94005,YOU NoDep Player 5,2009-06-01,F,BRA,U17,0,WS,WS,YOU,QF,2,1,1,0,0
+84006,WCDR64 Event 6,WCDR64,WCDR64,2026,2,5,94006,YOU NoDep Player 6,2009-06-01,F,USA,U17,0,WS,WS,YOU,QF,2,1,1,0,0

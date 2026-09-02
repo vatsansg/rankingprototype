@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Edit Result — WTT Ranking Engine{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Edit Imported Result</h1>
+  <table style="margin-bottom:16px">
+    <tr><th>Player</th><td>{{ row.player_name }} ({{ row.country_code or '—' }})</td></tr>
+    <tr><th>Event</th><td>{{ row.event_name }} ({{ row.event_type_general_code }})</td></tr>
+    <tr><th>Category / Ranking Category</th><td>{{ row.category_code }} / {{ row.ranking_category_code }}</td></tr>
+    <tr><th>Current result position</th><td><strong>{{ row.result_position }}</strong></td></tr>
+    <tr><th>Current points</th><td>{{ row.ranking_points }}</td></tr>
+  </table>
+
+  <form method="post">
+    <label for="result_position">New result position</label>
+    <select id="result_position" name="result_position">
+      {% for p in positions %}
+      <option value="{{ p }}" {{ 'selected' if p == row.result_position }}>{{ p }}</option>
+      {% endfor %}
+    </select>
+    <p class="muted">Points recompute automatically from the standard round-points table for
+      this category/ranking category/event type once saved.</p>
+
+    <label for="modified_by">Your name/email (for the audit log)</label>
+    <input type="text" id="modified_by" name="modified_by" value="web-ui" style="max-width:260px">
+
+    <button type="submit" name="action" value="save">Save</button>
+    <a class="btn secondary" href="{{ url_for('modify_list') }}">Cancel</a>
+  </form>
+</div>
+{% endblock %}

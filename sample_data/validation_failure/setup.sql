@@ -1,0 +1,4 @@
+-- Injected AFTER a run has seeded players_events_results_master, to simulate a
+-- data-integrity problem (duplicate result row) for SP_Ranking_DataValidation to catch.
+-- The test driver runs this against the already-populated table (competitor 92001, event 82001).
+INSERT INTO players_events_results_master (competitor_id, event_id, sub_event_code, ranking_category_code, result_position, ranking_points, ranking_year, ranking_month, ranking_week, expiry_year, expiry_month, expiry_week, active, category_code, age_category_code) SELECT competitor_id, event_id, sub_event_code, ranking_category_code, result_position, ranking_points, ranking_year, ranking_month, ranking_week, expiry_year, expiry_month, expiry_week, active, category_code, age_category_code FROM players_events_results_master WHERE competitor_id=92001 AND event_id=82001 AND ranking_category_code='MS';

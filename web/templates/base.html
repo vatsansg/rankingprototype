@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{% block title %}WTT Ranking Engine{% endblock %}</title>
+<style>
+  :root { --wtt-blue:#0a2f6b; --wtt-red:#e3253d; --bg:#f5f6f8; --card:#fff; --border:#dfe3e8;
+          --text:#1b1f24; --muted:#6b7280; --ok:#1c9a55; --fail:#e3253d; --pending:#9aa0a6; --running:#2563eb; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--text); }
+  header { background:var(--wtt-blue); color:#fff; padding:14px 24px; display:flex; align-items:center; justify-content:space-between; }
+  header a { color:#fff; text-decoration:none; font-weight:600; margin-left:18px; opacity:.9; }
+  header a:hover { opacity:1; text-decoration:underline; }
+  header .brand { font-size:18px; font-weight:700; letter-spacing:.02em; }
+  main { max-width:1100px; margin:24px auto; padding:0 20px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:20px; margin-bottom:20px; }
+  h1 { font-size:20px; margin:0 0 16px; }
+  h2 { font-size:16px; margin:0 0 12px; color:var(--wtt-blue); }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--border); }
+  th { color:var(--muted); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.03em; }
+  tr:hover td { background:#fafbfc; }
+  .badge { display:inline-block; padding:2px 9px; border-radius:12px; font-size:12px; font-weight:600; color:#fff; }
+  .badge-SUCCEEDED { background:var(--ok); }
+  .badge-FAILED { background:var(--fail); }
+  .badge-RUNNING { background:var(--running); }
+  .badge-PENDING { background:var(--pending); }
+  .badge-ABORTED_DEPENDENCY { background:#b45309; }
+  .badge-SKIPPED { background:var(--pending); }
+  label { display:block; font-weight:600; font-size:13px; margin:12px 0 4px; }
+  input, select { padding:7px 10px; border:1px solid var(--border); border-radius:5px; font-size:14px; width:100%; max-width:260px; }
+  button, .btn { background:var(--wtt-blue); color:#fff; border:none; padding:9px 18px; border-radius:5px; font-size:14px;
+                 font-weight:600; cursor:pointer; margin-top:14px; margin-right:8px; text-decoration:none; display:inline-block; }
+  button.secondary, .btn.secondary { background:#fff; color:var(--wtt-blue); border:1px solid var(--wtt-blue); }
+  button:hover, .btn:hover { opacity:.9; }
+  .muted { color:var(--muted); font-size:13px; }
+  .error { background:#fdecec; border:1px solid var(--fail); color:#7a1224; padding:10px 14px; border-radius:6px; margin-bottom:14px; }
+  .success { background:#eafaf1; border:1px solid var(--ok); color:#0e5c33; padding:10px 14px; border-radius:6px; margin-bottom:14px; }
+  .row-fields { display:flex; gap:16px; flex-wrap:wrap; }
+  .row-fields label { min-width:120px; }
+  code { background:#f0f1f3; padding:1px 5px; border-radius:3px; font-size:12.5px; }
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">WTT Ranking Engine — Prototype</span>
+  <nav>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('import_results') }}">Import Results</a>
+    <a href="{{ url_for('modify_list') }}">Manual Modifications</a>
+    <a href="{{ url_for('start_calculation') }}">Start Calculation</a>
+    <a href="{{ url_for('rankings') }}">Rankings</a>
+  </nav>
+</header>
+<main>
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>
