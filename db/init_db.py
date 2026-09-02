@@ -3,7 +3,11 @@ Builds the WTT Ranking Engine prototype SQLite database from scratch:
 schema.sql -> views.sql -> seed/reference_data.sql -> seed/load_ranking_calc_main.py.
 
 Usage: python db/init_db.py [path/to/rankingapp.db]
-Re-running deletes and rebuilds the target database file.
+Re-running drops and recreates every table/view in place, then reseeds -- deliberately does
+NOT delete the underlying file. On Windows, unlinking a file that any process (even briefly,
+e.g. the web app's last request) still holds open raises PermissionError; dropping objects
+within an open connection has no such requirement and works reliably even while the Flask
+dev server is running against the same file.
 """
 
 import sqlite3
@@ -15,13 +19,21 @@ sys.path.insert(0, str(DB_DIR))
 from seed import load_ranking_calc_main  # noqa: E402
 
 
-def build(db_path: Path) -> None:
-    if db_path.exists():
-        db_path.unlink()
+def _drop_all_objects(conn: sqlite3.Connection) -> None:
+    conn.execute("PRAGMA foreign_keys = OFF")
+    existing = conn.execute(
+        "SELECT type, name FROM sqlite_master WHERE type IN ('table', 'view') AND name NOT LIKE 'sqlite_%'"
+    ).fetchall()
+    for obj_type, name in existing:
+        conn.execute(f'DROP {obj_type.upper()} IF EXISTS "{name}"')
+    conn.commit()
 
+
+def build(db_path: Path) -> None:
     conn = sqlite3.connect(str(db_path))
-    conn.execute("PRAGMA foreign_keys = ON")
     try:
+        _drop_all_objects(conn)
+        conn.execute("PRAGMA foreign_keys = ON")
         schema_sql = (DB_DIR / "schema.sql").read_text(encoding="utf-8")
         conn.executescript(schema_sql)
 

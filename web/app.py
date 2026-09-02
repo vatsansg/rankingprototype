@@ -225,8 +225,12 @@ def run_detail(run_id: int):
     errors = conn.execute(
         "SELECT * FROM vw_RankingRunErrors WHERE ranking_run_id=? ORDER BY occurred_at", (run_id,)
     ).fetchall()
+    validations = conn.execute(
+        "SELECT * FROM ranking_validation_result WHERE ranking_run_id=? ORDER BY created_at DESC, ranking_validation_result_id DESC",
+        (run_id,),
+    ).fetchall()
     conn.close()
-    return render_template("run_detail.html", run=run, steps=steps, errors=errors)
+    return render_template("run_detail.html", run=run, steps=steps, errors=errors, validations=validations)
 
 
 @app.route("/run/<int:run_id>/validate", methods=["POST"])

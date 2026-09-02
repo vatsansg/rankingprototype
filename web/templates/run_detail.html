@@ -49,6 +49,27 @@
   </table>
 </div>
 
+{% if validations %}
+<div class="card">
+  <h2>Validation Findings</h2>
+  <p class="muted">From <code>SP_Ranking_DataValidation</code> — most recent run of each check first.</p>
+  <table>
+    <tr><th>Check</th><th>Result</th><th>Remarks</th><th>Table</th><th>Competitor</th><th>Event</th><th>When</th></tr>
+    {% for v in validations %}
+    <tr>
+      <td>{{ v.check_name }}</td>
+      <td><span class="badge badge-{{ 'SUCCEEDED' if v.passed else 'FAILED' }}">{{ 'PASS' if v.passed else 'FAIL' }}</span></td>
+      <td style="{{ 'color:#7a1224' if not v.passed else '' }}">{{ v.remarks or '' }}</td>
+      <td>{{ v.table_name or '—' }}</td>
+      <td>{{ v.competitor_id or '—' }}</td>
+      <td>{{ v.event_id or '—' }}</td>
+      <td>{{ v.created_at }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
 {% if errors %}
 <div class="card">
   <h2>Errors</h2>
