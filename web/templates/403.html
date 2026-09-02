@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Access Denied — WTT Ranking Engine{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Access Denied</h1>
+  <p class="error">Your role does not have permission to view this page.</p>
+  <a class="btn" href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</div>
+{% endblock %}

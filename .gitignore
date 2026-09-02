@@ -5,3 +5,6 @@ rankingapp.db
 *.db
 .venv/
 venv/
+
+# Real secrets -- never commit. See .env.example for the variable names.
+.env

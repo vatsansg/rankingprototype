@@ -1,28 +1,37 @@
-"""Shared pytest fixtures: a fresh, isolated SQLite DB per test."""
+"""
+Shared pytest fixtures for the Azure SQL backend. Unlike the old SQLite prototype (a fresh
+file-backed DB per test), every test now shares one already-deployed database (either the CI
+ephemeral SQL Server container, or a local/dev Azure SQL database pointed to by .env) and gets
+isolation via dbo.sp_ResetDemoData, which clears every business/audit/run table (imports,
+competitors, events, runs, validations) while leaving reference data and RBAC (app_user/
+app_role) untouched -- run both before and after each test so a prior test's leftovers can
+never leak into the next one.
+"""
 
-import sqlite3
+import sys
 from pathlib import Path
 
 import pytest
+from dotenv import load_dotenv
 
-from db.init_db import build
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+load_dotenv()
+
+from engine.db import get_connection  # noqa: E402
 
 SAMPLE_DATA = Path(__file__).resolve().parent.parent / "sample_data"
 
 
-@pytest.fixture()
-def db_path(tmp_path) -> Path:
-    path = tmp_path / "rankingapp_test.db"
-    build(path)
-    return path
+def _reset(connection) -> None:
+    connection.cursor().execute("{CALL dbo.sp_ResetDemoData}")
 
 
 @pytest.fixture()
-def conn(db_path) -> sqlite3.Connection:
-    connection = sqlite3.connect(str(db_path), isolation_level=None)
-    connection.row_factory = sqlite3.Row
-    connection.execute("PRAGMA foreign_keys = ON")
+def conn():
+    connection = get_connection()
+    _reset(connection)
     yield connection
+    _reset(connection)
     connection.close()
 
 

@@ -2,19 +2,66 @@ name: tests
 
 on:
   push:
-    branches: [master]
+    branches: [sqldb]
   pull_request:
-    branches: [master]
+    branches: [sqldb]
 
 jobs:
   pytest:
     runs-on: ubuntu-latest
+
+    # Ephemeral SQL Server container -- the real Azure SQL server is NEVER touched by CI.
+    # SA_PASSWORD here is a throwaway, CI-only credential unrelated to any real environment.
+    services:
+      mssql:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: "Y"
+          MSSQL_SA_PASSWORD: "CiOnly_Passw0rd!"
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd="/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'CiOnly_Passw0rd!' -Q 'SELECT 1'"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      AZURE_SQL_SERVER: "localhost,1433"
+      AZURE_SQL_DATABASE: "ranking_prototype2026_ci"
+      AZURE_SQL_USER: "sa"
+      AZURE_SQL_PASSWORD: "CiOnly_Passw0rd!"
+      AZURE_SQL_DRIVER: "{ODBC Driver 18 for SQL Server}"
+      AZURE_SQL_ENCRYPT: "no"
+      AZURE_SQL_TRUST_SERVER_CERTIFICATE: "yes"
+      SECRET_KEY: "ci-only-secret-key-not-a-real-credential"
+      ADMIN_SEED_USERNAME: "admin"
+      ADMIN_SEED_PASSWORD: "CiOnly_Admin123"
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Install ODBC Driver 18 for SQL Server
+        run: |
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+          curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt-get update
+          ACCEPT_EULA=Y sudo apt-get install -y msodbcsql18 unixodbc-dev
+
       - run: pip install -r requirements.txt
-      - run: python db/init_db.py
+
+      - name: Create CI database
+        run: |
+          /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "$AZURE_SQL_PASSWORD" \
+            -Q "IF DB_ID('$AZURE_SQL_DATABASE') IS NULL CREATE DATABASE [$AZURE_SQL_DATABASE]"
+
+      - name: Deploy schema, views, stored procedures, and seed data
+        run: python db/deploy_db.py
+
       - run: python sample_data/generate.py
+
       - run: python -m pytest -q

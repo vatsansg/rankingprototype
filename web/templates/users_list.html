@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Users — WTT Ranking Engine{% endblock %}
+{% block content %}
+<div class="card">
+  <div style="display:flex; justify-content:space-between; align-items:center">
+    <h1 style="margin:0">Users</h1>
+    {% if current_user.role_code == 'SUPERADMIN' %}
+    <a class="btn" href="{{ url_for('user_new') }}">New User</a>
+    {% endif %}
+  </div>
+  {% if current_user.role_code == 'RANKINGUSER' %}
+  <p class="muted">You can view users but only a SUPERADMIN can create, edit, or deactivate accounts.</p>
+  {% endif %}
+  <table>
+    <tr><th>Username</th><th>Role</th><th>Status</th><th>Last Login</th><th>Created</th>{% if current_user.role_code == 'SUPERADMIN' %}<th></th>{% endif %}</tr>
+    {% for u in users %}
+    <tr>
+      <td>{{ u.username }}</td>
+      <td><span class="tag">{{ u.role_code }}</span></td>
+      <td>{% if u.is_active %}<span class="badge badge-SUCCEEDED">Active</span>{% else %}<span class="badge badge-FAILED">Inactive</span>{% endif %}</td>
+      <td>{{ u.last_login_at if u.last_login_at else '—' }}</td>
+      <td>{{ u.created_at }}</td>
+      {% if current_user.role_code == 'SUPERADMIN' %}
+      <td><a class="btn secondary" href="{{ url_for('user_edit', app_user_id=u.app_user_id) }}">Edit</a></td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

@@ -13,16 +13,19 @@ def test_senior_happy_path_end_to_end(conn):
 
     run_id = sp_Calculate_Ranking_SEN(2026, 1, 1, triggered_by="pytest", conn=conn)
 
-    run = conn.execute("SELECT * FROM ranking_run WHERE ranking_run_id=?", (run_id,)).fetchone()
-    assert run["status"] == "SUCCEEDED"
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM dbo.ranking_run WHERE ranking_run_id=?", run_id)
+    run = cur.fetchone()
+    assert run.status == "SUCCEEDED"
 
-    steps = conn.execute(
-        "SELECT step_seq, step_name, status FROM ranking_run_step WHERE ranking_run_id=? ORDER BY step_seq",
-        (run_id,),
-    ).fetchall()
+    cur.execute(
+        "SELECT step_seq, step_name, status FROM dbo.ranking_run_step WHERE ranking_run_id=? ORDER BY step_seq",
+        run_id,
+    )
+    steps = cur.fetchall()
     assert len(steps) == 10
-    assert all(s["status"] == "SUCCEEDED" for s in steps)
-    assert [s["step_name"] for s in steps] == [
+    assert all(s.status == "SUCCEEDED" for s in steps)
+    assert [s.step_name for s in steps] == [
         "SP_Calculate_Ranking_UpdatePlayersInfoFromTTU",
         "sp_Calculate_Ranking_Step2_DataPreparationforNewRun",
         "sp_Calculate_Ranking_Step3_InsertRecordsintoMainRanking",
@@ -36,39 +39,42 @@ def test_senior_happy_path_end_to_end(conn):
     ]
 
     # Every player has exactly 8 counted results (best-of-8), including the mandatory ZPP row.
-    counted = conn.execute(
-        "SELECT competitor_id, COUNT(*) AS n FROM players_events_results_master "
+    cur.execute(
+        "SELECT competitor_id, COUNT(*) AS n FROM dbo.players_events_results_master "
         "WHERE category_code='SEN' AND active=1 AND best_result_no_sen_you=1 GROUP BY competitor_id"
-    ).fetchall()
+    )
+    counted = cur.fetchall()
     assert len(counted) == 15
-    assert all(r["n"] == 8 for r in counted)
+    assert all(r.n == 8 for r in counted)
 
     # Player 90001's ZPP row: 0 points, still counted.
-    zpp_row = conn.execute(
+    cur.execute(
         "SELECT ranking_points, best_result_no_sen_you, zero_point_penalty, active "
-        "FROM players_events_results_master WHERE competitor_id=90001 AND event_id=80005"
-    ).fetchone()
-    assert zpp_row["zero_point_penalty"] == 1
-    assert zpp_row["ranking_points"] == 0
-    assert zpp_row["best_result_no_sen_you"] == 1
-    assert zpp_row["active"] == 1
+        "FROM dbo.players_events_results_master WHERE competitor_id=90001 AND event_id=80005"
+    )
+    zpp_row = cur.fetchone()
+    assert zpp_row.zero_point_penalty == 1
+    assert zpp_row.ranking_points == 0
+    assert zpp_row.best_result_no_sen_you == 1
+    assert zpp_row.active == 1
 
     # Each player has at most 1 continental (Con) result counted toward their best-of-8.
-    continental_counts = conn.execute(
+    cur.execute(
         """
-        SELECT p.competitor_id, COUNT(*) AS n FROM players_events_results_master p
-        JOIN events e ON e.event_id = p.event_id
+        SELECT p.competitor_id, COUNT(*) AS n FROM dbo.players_events_results_master p
+        JOIN dbo.events e ON e.event_id = p.event_id
         WHERE p.category_code='SEN' AND p.best_result_no_sen_you=1 AND e.event_type_general_code='Con'
         GROUP BY p.competitor_id
         """
-    ).fetchall()
-    assert all(r["n"] <= 1 for r in continental_counts)
+    )
+    continental_counts = cur.fetchall()
+    assert all(r.n <= 1 for r in continental_counts)
 
     # Published ranking output exists and is ordered.
-    positions = conn.execute(
-        "SELECT ranking_pos FROM vw_RankingResult WHERE ranking_category='MS' ORDER BY ranking_pos"
-    ).fetchall()
-    assert [r["ranking_pos"] for r in positions] == list(range(1, len(positions) + 1))
+    cur.execute("SELECT ranking_pos FROM vw_RankingResult WHERE ranking_category='MS' ORDER BY ranking_pos")
+    positions = cur.fetchall()
+    assert [r.ranking_pos for r in positions] == list(range(1, len(positions) + 1))
 
     # new_events_results cleared for the category by the finalize step.
-    assert conn.execute("SELECT COUNT(*) FROM new_events_results WHERE category_code='SEN'").fetchone()[0] == 0
+    cur.execute("SELECT COUNT(*) FROM dbo.new_events_results WHERE category_code='SEN'")
+    assert cur.fetchone()[0] == 0

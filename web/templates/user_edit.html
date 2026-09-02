@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ user.username }} — WTT Ranking Engine{% endblock %}
+{% block content %}
+<div class="card" style="max-width:480px;">
+  <h1>{{ user.username }}</h1>
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  <p class="muted">Status: {% if user.is_active %}<span class="badge badge-SUCCEEDED">Active</span>{% else %}<span class="badge badge-FAILED">Inactive</span>{% endif %}</p>
+
+  <h2>Role</h2>
+  <form method="post">
+    <input type="hidden" name="action" value="role">
+    <select name="role_code" style="max-width:100%;">
+      {% for r in roles %}<option value="{{ r }}" {% if r == user.role_code %}selected{% endif %}>{{ r }}</option>{% endfor %}
+    </select>
+    <button type="submit">Update Role</button>
+  </form>
+
+  <h2>Status</h2>
+  {% if user.is_active %}
+  <form method="post" onsubmit="return confirm('Deactivate this user? They will no longer be able to log in.');">
+    <input type="hidden" name="action" value="deactivate">
+    <button type="submit" style="background:var(--fail); color:#fff;">Deactivate User</button>
+  </form>
+  {% else %}
+  <form method="post">
+    <input type="hidden" name="action" value="activate">
+    <button type="submit">Reactivate User</button>
+  </form>
+  {% endif %}
+
+  <h2>Reset Password</h2>
+  <form method="post">
+    <input type="hidden" name="action" value="reset_password">
+    <label for="new_password">New Password</label>
+    <input type="password" id="new_password" name="new_password" required style="max-width:100%;">
+    <p class="muted">At least 8 characters, with at least one letter and one digit.</p>
+    <button type="submit">Reset Password</button>
+  </form>
+
+  <a class="btn secondary" href="{{ url_for('users_list') }}">Back to Users</a>
+</div>
+{% endblock %}

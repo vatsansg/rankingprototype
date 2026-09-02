@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}New User — WTT Ranking Engine{% endblock %}
+{% block content %}
+<div class="card" style="max-width:420px;">
+  <h1>New User</h1>
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  <form method="post">
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" required style="max-width:100%;">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" required style="max-width:100%;">
+    <p class="muted">At least 8 characters, with at least one letter and one digit.</p>
+    <label for="role_code">Role</label>
+    <select id="role_code" name="role_code" style="max-width:100%;">
+      {% for r in roles %}<option value="{{ r }}">{{ r }}</option>{% endfor %}
+    </select>
+    <button type="submit">Create User</button>
+    <a class="btn secondary" href="{{ url_for('users_list') }}">Cancel</a>
+  </form>
+</div>
+{% endblock %}
