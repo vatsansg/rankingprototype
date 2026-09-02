@@ -22,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from flask import Flask, redirect, render_template, request, url_for  # noqa: E402
 
+from db.init_db import build as build_database  # noqa: E402
 from engine.db import DB_PATH  # noqa: E402
 from engine.master import (  # noqa: E402
     run_combined,
@@ -67,7 +68,16 @@ def dashboard():
     conn = get_db()
     runs = conn.execute("SELECT * FROM vw_RankingRunSummary LIMIT 50").fetchall()
     conn.close()
-    return render_template("dashboard.html", runs=runs)
+    return render_template("dashboard.html", runs=runs, just_reset=request.args.get("reset") == "1")
+
+
+@app.route("/reset-db", methods=["POST"])
+def reset_db():
+    # Rebuilds the whole database from schema.sql + views.sql + reference-data seed --
+    # wipes every import, run, and manual modification. Intended for resetting between
+    # demos; confirmed client-side (see dashboard.html) before this request is ever sent.
+    build_database(DB_PATH)
+    return redirect(url_for("dashboard", reset="1"))
 
 
 @app.route("/import", methods=["GET", "POST"])

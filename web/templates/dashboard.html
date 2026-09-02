@@ -1,8 +1,18 @@
 {% extends "base.html" %}
 {% block title %}Dashboard — WTT Ranking Engine{% endblock %}
 {% block content %}
+{% if just_reset %}
+<div class="success">Database reset — all imports, runs, and modifications cleared. Ready for a fresh demo.</div>
+{% endif %}
+
 <div class="card">
-  <h1>Ranking Runs</h1>
+  <div style="display:flex; justify-content:space-between; align-items:center">
+    <h1 style="margin:0">Ranking Runs</h1>
+    <form method="post" action="{{ url_for('reset_db') }}"
+          onsubmit="return confirm('This clears ALL imported results, calculation runs, and manual modifications, and reseeds reference data fresh. This cannot be undone. Continue?');">
+      <button type="submit" style="background:var(--wtt-red); margin-top:0">Clear Database (Demo Reset)</button>
+    </form>
+  </div>
   {% if not runs %}
     <p class="muted">No runs yet. <a href="{{ url_for('import_results') }}">Import some results</a> and
     <a href="{{ url_for('start_calculation') }}">start a calculation</a>.</p>
