@@ -1,17 +1,19 @@
 """
-Seeds the ranking_calc_main table (points-per-round lookup, ~366 rows) directly from the
-legacy production CSV export, rather than hand-transcribing a large table into SQL.
+Seeds the ranking_calc_main table (points-per-round lookup, ~366 rows) directly from a CSV,
+rather than hand-transcribing a large table into SQL.
 
-Source (read-only, never modified): C:\\vatsan\\ranking\\RANKINGS2026\\data\\dbo_RankingCalcMain_New.csv
-This is the current/active points table per the reverse-engineering research (RankingCalcMain_New
-supersedes the older RankingCalcMain in column layout and is treated as the source of truth here).
+Source: db/seed/ranking_calc_main_source.csv, a copy of the legacy production export
+dbo_RankingCalcMain_New.csv (bundled inside this repo so the build has no dependency on the
+original legacy machine/path -- it must work standalone, including in CI). RankingCalcMain_New
+supersedes the older RankingCalcMain in column layout and is treated as the source of truth here,
+per the reverse-engineering research.
 """
 
 import csv
 import sqlite3
 from pathlib import Path
 
-LEGACY_CSV = Path(r"C:\vatsan\ranking\RANKINGS2026\data\dbo_RankingCalcMain_New.csv")
+SOURCE_CSV = Path(__file__).resolve().parent / "ranking_calc_main_source.csv"
 
 # Legacy CSV column name -> ranking_calc_main column name (order-preserving where identical).
 COLUMN_MAP = [
@@ -32,10 +34,10 @@ INT_COLUMNS = {"w", "f", "sf", "qf", "r16", "r32", "r64", "r128", "r256",
 
 
 def load(conn: sqlite3.Connection) -> int:
-    if not LEGACY_CSV.exists():
-        raise FileNotFoundError(f"Legacy reference CSV not found: {LEGACY_CSV}")
+    if not SOURCE_CSV.exists():
+        raise FileNotFoundError(f"Legacy reference CSV not found: {SOURCE_CSV}")
 
-    with LEGACY_CSV.open(newline="", encoding="utf-8-sig") as f:
+    with SOURCE_CSV.open(newline="", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         rows = []
         for row in reader:
@@ -65,6 +67,6 @@ if __name__ == "__main__":
     try:
         n = load(conn)
         conn.commit()
-        print(f"Loaded {n} ranking_calc_main rows from {LEGACY_CSV.name} into {db_path}")
+        print(f"Loaded {n} ranking_calc_main rows from {SOURCE_CSV.name} into {db_path}")
     finally:
         conn.close()
