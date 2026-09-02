@@ -1,5 +1,9 @@
 # WTT Ranking Engine — SQLite Prototype
 
+[![tests](https://github.com/vatsansg/rankingprototype/actions/workflows/tests.yml/badge.svg)](https://github.com/vatsansg/rankingprototype/actions/workflows/tests.yml)
+![Python](https://img.shields.io/badge/python-3.12%2B-blue)
+![Flask](https://img.shields.io/badge/flask-3.x-black)
+
 A from-scratch, fully auditable reimplementation of the WTT (World Table Tennis) Senior and
 Youth ranking calculation, replacing the legacy SQL Server dynamic-SQL rule engine
 (`RulesSet`/`RulesGroup`/`Rules`/`RulesAlias` → `sp_Rules_ExecuteRule` builds and executes a
@@ -87,7 +91,7 @@ legacy-SP → prototype-function mapping and the verified real execution order (
 
 ```
 cd prototype/rankingapp
-pip install flask pytest
+pip install -r requirements.txt
 python db/init_db.py          # builds rankingapp.db from schema.sql + views.sql + seed data
 python sample_data/generate.py  # regenerates the 5 sample fixtures (idempotent, no RNG)
 python -m pytest -q           # 15 tests
