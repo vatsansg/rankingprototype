@@ -45,18 +45,19 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install ODBC Driver 18 for SQL Server
+      - name: Install ODBC Driver 18 and sqlcmd (mssql-tools18) for SQL Server
         run: |
           curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
           curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
           sudo apt-get update
-          ACCEPT_EULA=Y sudo apt-get install -y msodbcsql18 unixodbc-dev
+          ACCEPT_EULA=Y sudo apt-get install -y msodbcsql18 mssql-tools18 unixodbc-dev
+          echo "/opt/mssql-tools18/bin" >> "$GITHUB_PATH"
 
       - run: pip install -r requirements.txt
 
       - name: Create CI database
         run: |
-          /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "$AZURE_SQL_PASSWORD" \
+          sqlcmd -C -S localhost -U sa -P "$AZURE_SQL_PASSWORD" \
             -Q "IF DB_ID('$AZURE_SQL_DATABASE') IS NULL CREATE DATABASE [$AZURE_SQL_DATABASE]"
 
       - name: Deploy schema, views, stored procedures, and seed data
