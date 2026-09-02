@@ -10,7 +10,7 @@
     <h1 style="margin:0">Ranking Runs</h1>
     <form method="post" action="{{ url_for('reset_db') }}"
           onsubmit="return confirm('This clears ALL imported results, calculation runs, and manual modifications, and reseeds reference data fresh. This cannot be undone. Continue?');">
-      <button type="submit" style="background:var(--wtt-red); margin-top:0">Clear Database (Demo Reset)</button>
+      <button type="submit" style="background:var(--fail); color:#fff; margin-top:0">Clear Database (Demo Reset)</button>
     </form>
   </div>
   {% if not runs %}

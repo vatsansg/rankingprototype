@@ -43,7 +43,7 @@
       <td><span class="badge badge-{{ s.step_status }}">{{ s.step_status }}</span></td>
       <td>{{ s.rows_inserted }}/{{ s.rows_updated }}/{{ s.rows_deleted }}</td>
       <td>{{ s.duration_ms if s.duration_ms is not none else '—' }}ms</td>
-      <td style="{{ 'color:#7a1224' if s.step_status == 'FAILED' else '' }}">{{ s.result_message or '' }}</td>
+      <td style="{{ 'color:#ff8a99' if s.step_status == 'FAILED' else '' }}">{{ s.result_message or '' }}</td>
     </tr>
     {% endfor %}
   </table>
@@ -59,7 +59,7 @@
     <tr>
       <td>{{ v.check_name }}</td>
       <td><span class="badge badge-{{ 'SUCCEEDED' if v.passed else 'FAILED' }}">{{ 'PASS' if v.passed else 'FAIL' }}</span></td>
-      <td style="{{ 'color:#7a1224' if not v.passed else '' }}">{{ v.remarks or '' }}</td>
+      <td style="{{ 'color:#ff8a99' if not v.passed else '' }}">{{ v.remarks or '' }}</td>
       <td>{{ v.table_name or '—' }}</td>
       <td>{{ v.competitor_id or '—' }}</td>
       <td>{{ v.event_id or '—' }}</td>

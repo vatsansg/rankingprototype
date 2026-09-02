@@ -3,23 +3,37 @@
 <head>
 <meta charset="utf-8">
 <title>{% block title %}WTT Ranking Engine{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
 <style>
-  :root { --wtt-blue:#0a2f6b; --wtt-red:#e3253d; --bg:#f5f6f8; --card:#fff; --border:#dfe3e8;
-          --text:#1b1f24; --muted:#6b7280; --ok:#1c9a55; --fail:#e3253d; --pending:#9aa0a6; --running:#2563eb; }
+  /* WTT brand tokens. Bio Sans (the brand's body font) is a licensed WTT font not available
+     via a public CDN -- substituted here with a clean system sans-serif stack. Roboto Bold
+     (the brand's display font) is loaded from Google Fonts for headlines. */
+  :root {
+    --wtt-black:#000000; --wtt-white:#fff; --wtt-orange:#FF6B00; --wtt-blue:#007AD9; --wtt-teal:#2BABD2;
+    --surface:#121212; --border:#2a2a2a; --muted:#a8a8a8;
+    --ok:#1c9a55; --fail:#e3253d; --pending:#6b6b6b; --running:var(--wtt-blue);
+    --font-display: 'Roboto', Arial, sans-serif;
+    --font-body: 'Bio Sans', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
   * { box-sizing: border-box; }
-  body { margin:0; font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--text); }
-  header { background:var(--wtt-blue); color:#fff; padding:14px 24px; display:flex; align-items:center; justify-content:space-between; }
-  header a { color:#fff; text-decoration:none; font-weight:600; margin-left:18px; opacity:.9; }
-  header a:hover { opacity:1; text-decoration:underline; }
-  header .brand { font-size:18px; font-weight:700; letter-spacing:.02em; }
+  body { margin:0; font-family:var(--font-body); background:var(--wtt-black); color:var(--wtt-white); }
+  header { background:var(--wtt-black); border-bottom:2px solid var(--wtt-orange); color:var(--wtt-white);
+           padding:14px 24px; display:flex; align-items:center; justify-content:space-between; }
+  header a { color:var(--wtt-white); text-decoration:none; font-weight:600; margin-left:18px; opacity:.85; }
+  header a:hover { opacity:1; color:var(--wtt-teal); }
+  header .brand { font-family:var(--font-display); font-weight:700; font-size:18px; letter-spacing:.03em;
+                  color:var(--wtt-orange); text-transform:uppercase; }
   main { max-width:1100px; margin:24px auto; padding:0 20px; }
-  .card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:20px; margin-bottom:20px; }
-  h1 { font-size:20px; margin:0 0 16px; }
-  h2 { font-size:16px; margin:0 0 12px; color:var(--wtt-blue); }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-bottom:20px; }
+  h1 { font-family:var(--font-display); font-weight:700; font-size:22px; margin:0 0 16px; text-transform:capitalize; letter-spacing:.01em; }
+  h2 { font-family:var(--font-display); font-weight:700; font-size:16px; margin:0 0 12px; color:var(--wtt-teal); }
   table { width:100%; border-collapse:collapse; font-size:14px; }
   th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--border); }
   th { color:var(--muted); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.03em; }
-  tr:hover td { background:#fafbfc; }
+  tr:hover td { background:#1a1a1a; }
+  a { color:var(--wtt-blue); }
   .badge { display:inline-block; padding:2px 9px; border-radius:12px; font-size:12px; font-weight:600; color:#fff; }
   .badge-SUCCEEDED { background:var(--ok); }
   .badge-FAILED { background:var(--fail); }
@@ -27,23 +41,28 @@
   .badge-PENDING { background:var(--pending); }
   .badge-ABORTED_DEPENDENCY { background:#b45309; }
   .badge-SKIPPED { background:var(--pending); }
-  label { display:block; font-weight:600; font-size:13px; margin:12px 0 4px; }
-  input, select { padding:7px 10px; border:1px solid var(--border); border-radius:5px; font-size:14px; width:100%; max-width:260px; }
-  button, .btn { background:var(--wtt-blue); color:#fff; border:none; padding:9px 18px; border-radius:5px; font-size:14px;
-                 font-weight:600; cursor:pointer; margin-top:14px; margin-right:8px; text-decoration:none; display:inline-block; }
-  button.secondary, .btn.secondary { background:#fff; color:var(--wtt-blue); border:1px solid var(--wtt-blue); }
-  button:hover, .btn:hover { opacity:.9; }
+  .tag { display:inline-block; padding:1px 8px; border-radius:4px; font-size:11px; font-weight:700;
+         letter-spacing:.03em; text-transform:uppercase; background:rgba(43,171,210,.15); color:var(--wtt-teal); }
+  label { display:block; font-weight:600; font-size:13px; margin:12px 0 4px; color:var(--muted); }
+  input, select { padding:7px 10px; border:1px solid var(--border); border-radius:5px; font-size:14px;
+                  width:100%; max-width:260px; background:#1a1a1a; color:var(--wtt-white); }
+  /* Primary CTA: WTT orange, reserved for the one key action per view -- caps per brand CTA convention. */
+  button, .btn { background:var(--wtt-orange); color:#000; border:none; padding:9px 18px; border-radius:5px;
+                 font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; cursor:pointer;
+                 margin-top:14px; margin-right:8px; text-decoration:none; display:inline-block; font-family:var(--font-body); }
+  button.secondary, .btn.secondary { background:transparent; color:var(--wtt-blue); border:1px solid var(--wtt-blue); }
+  button:hover, .btn:hover { opacity:.85; }
   .muted { color:var(--muted); font-size:13px; }
-  .error { background:#fdecec; border:1px solid var(--fail); color:#7a1224; padding:10px 14px; border-radius:6px; margin-bottom:14px; }
-  .success { background:#eafaf1; border:1px solid var(--ok); color:#0e5c33; padding:10px 14px; border-radius:6px; margin-bottom:14px; }
+  .error { background:rgba(227,37,61,.12); border:1px solid var(--fail); color:#ff8a99; padding:10px 14px; border-radius:6px; margin-bottom:14px; }
+  .success { background:rgba(28,154,85,.12); border:1px solid var(--ok); color:#5fe0a0; padding:10px 14px; border-radius:6px; margin-bottom:14px; }
   .row-fields { display:flex; gap:16px; flex-wrap:wrap; }
   .row-fields label { min-width:120px; }
-  code { background:#f0f1f3; padding:1px 5px; border-radius:3px; font-size:12.5px; }
+  code { background:#1a1a1a; color:var(--wtt-teal); padding:1px 5px; border-radius:3px; font-size:12.5px; }
 </style>
 </head>
 <body>
 <header>
-  <span class="brand">WTT Ranking Engine — Prototype</span>
+  <span class="brand">WTT Ranking Engine</span>
   <nav>
     <a href="{{ url_for('dashboard') }}">Dashboard</a>
     <a href="{{ url_for('import_results') }}">Import Results</a>
