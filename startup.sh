@@ -32,5 +32,13 @@ else
     echo "msodbcsql18 already installed, skipping"
 fi
 
+# Belt-and-suspenders: install our own dependencies directly with whatever python/pip is on
+# PATH, rather than relying on Oryx's build-time pip install landing somewhere this custom
+# startup command's gunicorn process actually sees (a mismatch that caused
+# "ModuleNotFoundError: No module named 'dotenv'" even with SCM_DO_BUILD_DURING_DEPLOYMENT=true
+# and a build step that ran -- Oryx likely installed into a venv this script never activates).
+echo "=== installing Python dependencies ==="
+python3 -m pip install --no-cache-dir -q -r requirements.txt
+
 echo "=== launching gunicorn ==="
 exec gunicorn --bind=0.0.0.0 --timeout 600 wsgi:app
